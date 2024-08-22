@@ -25,7 +25,6 @@ from chromadb.api.types import (
     Include,
     Loadable,
     Metadata,
-    Metadatas,
     Document,
     Documents,
     Image,
@@ -41,7 +40,6 @@ from chromadb.api.types import (
     validate_ids,
     validate_include,
     validate_metadata,
-    validate_metadatas,
     validate_embeddings,
     validate_embedding_function,
     validate_n_results,
@@ -177,64 +175,15 @@ class CollectionCommon(Generic[ClientT]):
 
     def _validate_record_set(
         self,
-        ids: IDs,
-        embeddings: Optional[Embeddings],
-        metadatas: Optional[Metadatas],
         documents: Optional[Documents],
         images: Optional[Images],
-        uris: Optional[URIs],
-        require_embeddings_or_data: bool = True,
     ) -> None:
-        valid_ids = validate_ids(ids)
-        valid_embeddings = (
-            validate_embeddings(embeddings) if embeddings is not None else None
-        )
-        valid_metadatas = (
-            validate_metadatas(metadatas) if metadatas is not None else None
-        )
-
-        # No additional validation needed for documents, images, or uris
         valid_documents = documents
         valid_images = images
-        valid_uris = uris
-
-        # Check that one of embeddings or ducuments or images is provided
-        if require_embeddings_or_data:
-            if (
-                valid_embeddings is None
-                and valid_documents is None
-                and valid_images is None
-                and valid_uris is None
-            ):
-                raise ValueError(
-                    "You must provide embeddings, documents, images, or uris."
-                )
 
         # Only one of documents or images can be provided
         if valid_documents is not None and valid_images is not None:
             raise ValueError("You can only provide documents or images, not both.")
-
-        # Check that, if they're provided, the lengths of the arrays match the length of ids
-        if valid_embeddings is not None and len(valid_embeddings) != len(valid_ids):
-            raise ValueError(
-                f"Number of embeddings {len(valid_embeddings)} must match number of ids {len(valid_ids)}"
-            )
-        if valid_metadatas is not None and len(valid_metadatas) != len(valid_ids):
-            raise ValueError(
-                f"Number of metadatas {len(valid_metadatas)} must match number of ids {len(valid_ids)}"
-            )
-        if valid_documents is not None and len(valid_documents) != len(valid_ids):
-            raise ValueError(
-                f"Number of documents {len(valid_documents)} must match number of ids {len(valid_ids)}"
-            )
-        if valid_images is not None and len(valid_images) != len(valid_ids):
-            raise ValueError(
-                f"Number of images {len(valid_images)} must match number of ids {len(valid_ids)}"
-            )
-        if valid_uris is not None and len(valid_uris) != len(valid_ids):
-            raise ValueError(
-                f"Number of uris {len(valid_uris)} must match number of ids {len(valid_ids)}"
-            )
 
     def _compute_embeddings(
         self,
@@ -432,19 +381,9 @@ class CollectionCommon(Generic[ClientT]):
             uris=uris,
         )
 
-        normalized_embeddings = (
-            self._normalize_embeddings(unpacked_record_set["embeddings"])
-            if unpacked_record_set["embeddings"] is not None
-            else None
-        )
-
         self._validate_record_set(
-            ids=unpacked_record_set["ids"],
-            embeddings=normalized_embeddings,
-            metadatas=unpacked_record_set["metadatas"],
             documents=unpacked_record_set["documents"],
             images=unpacked_record_set["images"],
-            uris=unpacked_record_set["uris"],
         )
 
         prepared_embeddings = (
@@ -453,8 +392,8 @@ class CollectionCommon(Generic[ClientT]):
                 images=unpacked_record_set["images"],
                 uris=unpacked_record_set["uris"],
             )
-            if normalized_embeddings is None
-            else normalized_embeddings
+            if unpacked_record_set["embeddings"] is None
+            else unpacked_record_set["embeddings"]
         )
 
         return {
@@ -489,19 +428,10 @@ class CollectionCommon(Generic[ClientT]):
             uris=uris,
         )
 
-        normalized_embeddings = (
-            self._normalize_embeddings(unpacked_record_set["embeddings"])
-            if unpacked_record_set["embeddings"] is not None
-            else None
-        )
 
         self._validate_record_set(
-            ids=unpacked_record_set["ids"],
-            embeddings=normalized_embeddings,
-            metadatas=unpacked_record_set["metadatas"],
             documents=unpacked_record_set["documents"],
             images=unpacked_record_set["images"],
-            uris=unpacked_record_set["uris"],
         )
 
         prepared_embeddings = (
@@ -510,8 +440,8 @@ class CollectionCommon(Generic[ClientT]):
                 images=unpacked_record_set["images"],
                 uris=None,
             )
-            if normalized_embeddings is None
-            else normalized_embeddings
+            if unpacked_record_set["embeddings"] is None
+            else unpacked_record_set["embeddings"]
         )
 
         return {
@@ -546,23 +476,12 @@ class CollectionCommon(Generic[ClientT]):
             uris=uris,
         )
 
-        normalized_embeddings = (
-            self._normalize_embeddings(unpacked_record_set["embeddings"])
-            if unpacked_record_set["embeddings"] is not None
-            else None
-        )
-
         self._validate_record_set(
-            ids=unpacked_record_set["ids"],
-            embeddings=normalized_embeddings,
-            metadatas=unpacked_record_set["metadatas"],
             documents=unpacked_record_set["documents"],
             images=unpacked_record_set["images"],
-            uris=unpacked_record_set["uris"],
-            require_embeddings_or_data=False,
         )
 
-        prepared_embeddings = normalized_embeddings
+        prepared_embeddings = unpacked_record_set["embeddings"]
         if prepared_embeddings is None and does_record_set_contain_data(
             unpacked_record_set, include=["documents", "images"]
         ):
