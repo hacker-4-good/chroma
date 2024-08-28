@@ -46,6 +46,7 @@ from chromadb.api.types import (
     validate_where,
     validate_where_document,
     does_record_set_contain_data,
+    validate_record_set,
 )
 
 # TODO: We should rename the types in chromadb.types to be Models where
@@ -173,17 +174,25 @@ class CollectionCommon(Generic[ClientT]):
             "uris": unpacked_uris,
         }
 
+    @staticmethod
     def _validate_record_set(
-        self,
-        documents: Optional[Documents],
-        images: Optional[Images],
+        record_set: RecordSet,
+        require_data: bool,
     ) -> None:
-        valid_documents = documents
-        valid_images = images
-
         # Only one of documents or images can be provided
-        if valid_documents is not None and valid_images is not None:
+        if record_set["documents"] is not None and record_set["images"] is not None:
             raise ValueError("You can only provide documents or images, not both.")
+
+        if (
+            require_data
+            and record_set["embeddings"] is None
+            and record_set["documents"] is None
+            and record_set["images"] is None
+            and record_set["uris"] is None
+        ):
+            raise ValueError("You must provide embeddings, documents, images, or URIs.")
+
+        validate_record_set(record_set)
 
     def _compute_embeddings(
         self,
@@ -382,8 +391,8 @@ class CollectionCommon(Generic[ClientT]):
         )
 
         self._validate_record_set(
-            documents=unpacked_record_set["documents"],
-            images=unpacked_record_set["images"],
+            unpacked_record_set,
+            require_data=True,
         )
 
         prepared_embeddings = (
@@ -396,14 +405,9 @@ class CollectionCommon(Generic[ClientT]):
             else unpacked_record_set["embeddings"]
         )
 
-        return {
-            "ids": unpacked_record_set["ids"],
-            "embeddings": prepared_embeddings,
-            "metadatas": unpacked_record_set["metadatas"],
-            "documents": unpacked_record_set["documents"],
-            "images": unpacked_record_set["images"],
-            "uris": unpacked_record_set["uris"],
-        }
+        unpacked_record_set["embeddings"] = prepared_embeddings
+
+        return unpacked_record_set
 
     def _process_upsert_request(
         self,
@@ -418,6 +422,7 @@ class CollectionCommon(Generic[ClientT]):
         documents: Optional[OneOrMany[Document]],
         images: Optional[OneOrMany[Image]],
         uris: Optional[OneOrMany[URI]],
+        require_data: bool,
     ) -> RecordSet:
         unpacked_record_set = self._unpack_record_set(
             ids=ids,
@@ -430,8 +435,8 @@ class CollectionCommon(Generic[ClientT]):
 
 
         self._validate_record_set(
-            documents=unpacked_record_set["documents"],
-            images=unpacked_record_set["images"],
+            unpacked_record_set,
+            require_data=True,
         )
 
         prepared_embeddings = (
@@ -477,8 +482,8 @@ class CollectionCommon(Generic[ClientT]):
         )
 
         self._validate_record_set(
-            documents=unpacked_record_set["documents"],
-            images=unpacked_record_set["images"],
+            unpacked_record_set,
+            require_data=False,
         )
 
         prepared_embeddings = unpacked_record_set["embeddings"]
