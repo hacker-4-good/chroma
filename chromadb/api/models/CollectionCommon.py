@@ -187,7 +187,7 @@ class CollectionCommon(Generic[ClientT]):
         if require_data and not does_record_set_contain_data(
             record_set, include=["embeddings", "documents", "images", "uris"]
         ):
-            raise ValueError("You must provide embeddings, documents, images, or URIs.")
+            raise ValueError("You must provide embeddings, documents, images, or uris.")
 
         validate_record_set(record_set)
 
