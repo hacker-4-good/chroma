@@ -433,7 +433,6 @@ class CollectionCommon(Generic[ClientT]):
             uris=uris,
         )
 
-
         self._validate_record_set(
             unpacked_record_set,
             require_data=True,
