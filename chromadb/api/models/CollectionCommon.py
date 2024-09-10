@@ -420,7 +420,6 @@ class CollectionCommon(Generic[ClientT]):
         documents: Optional[OneOrMany[Document]],
         images: Optional[OneOrMany[Image]],
         uris: Optional[OneOrMany[URI]],
-        require_data: bool,
     ) -> RecordSet:
         unpacked_record_set = self._unpack_record_set(
             ids=ids,
