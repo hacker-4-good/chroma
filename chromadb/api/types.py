@@ -67,7 +67,9 @@ def maybe_cast_one_to_many_embedding(
     if isinstance(embeddings_list, List):
         # One Embedding
         if len(embeddings_list) == 0:
-            raise ValueError("Expected embeddings to be a list with at least one item")
+            raise ValueError(
+                "Expected embeddings to be a list or a numpy array with at least one item"
+            )
 
         if isinstance(embeddings_list[0], (int, float)):
             return cast(Embeddings, [embeddings_list])
@@ -615,7 +617,7 @@ def validate_record_set_consistency(record_set: RecordSet) -> None:
 
 def get_n_items_from_record_set(
     record_set: RecordSet,
-) -> Tuple[Union[str, None], Union[int, None]]:
+) -> Tuple[Optional[str], Optional[int]]:
     """
     Get the number of items in the record set.
     """
