@@ -436,7 +436,7 @@ class CollectionCommon(Generic[ClientT]):
             require_data=True,
         )
 
-        prepared_embeddings = (
+        unpacked_record_set["embeddings"] = (
             self._compute_embeddings(
                 documents=unpacked_record_set["documents"],
                 images=unpacked_record_set["images"],
@@ -446,14 +446,7 @@ class CollectionCommon(Generic[ClientT]):
             else unpacked_record_set["embeddings"]
         )
 
-        return {
-            "ids": unpacked_record_set["ids"],
-            "embeddings": prepared_embeddings,
-            "metadatas": unpacked_record_set["metadatas"],
-            "documents": unpacked_record_set["documents"],
-            "images": unpacked_record_set["images"],
-            "uris": unpacked_record_set["uris"],
-        }
+        return unpacked_record_set
 
     def _process_update_request(
         self,
@@ -487,20 +480,13 @@ class CollectionCommon(Generic[ClientT]):
         if prepared_embeddings is None and does_record_set_contain_data(
             unpacked_record_set, include=["documents", "images"]
         ):
-            prepared_embeddings = self._compute_embeddings(
+            unpacked_record_set["embeddings"] = self._compute_embeddings(
                 documents=unpacked_record_set["documents"],
                 images=unpacked_record_set["images"],
                 uris=None,
             )
 
-        return {
-            "ids": unpacked_record_set["ids"],
-            "embeddings": prepared_embeddings,
-            "metadatas": unpacked_record_set["metadatas"],
-            "documents": unpacked_record_set["documents"],
-            "images": unpacked_record_set["images"],
-            "uris": unpacked_record_set["uris"],
-        }
+        return unpacked_record_set
 
     def _validate_and_prepare_delete_request(
         self,
