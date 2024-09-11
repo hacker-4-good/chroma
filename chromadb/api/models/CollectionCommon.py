@@ -427,6 +427,9 @@ class CollectionCommon(Generic[ClientT]):
             uris=uris,
         )
 
+        if unpacked_record_set["ids"] is None:
+            raise ValueError("You must provide ids.")
+
         self._validate_record_set(
             unpacked_record_set,
             require_data=True,
@@ -466,6 +469,9 @@ class CollectionCommon(Generic[ClientT]):
             images=images,
             uris=uris,
         )
+
+        if unpacked_record_set["ids"] is None:
+            raise ValueError("You must provide ids.")
 
         self._validate_record_set(
             unpacked_record_set,
