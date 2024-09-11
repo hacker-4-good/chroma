@@ -73,6 +73,10 @@ def maybe_cast_one_to_many_embedding(
 
         if isinstance(embeddings_list[0], (int, float)):
             return cast(Embeddings, [embeddings_list])
+    else:
+        raise ValueError(
+            f"Expected embeddings to be a list or a numpy array, got {type(embeddings_list).__name__}"
+        )
 
     return cast(Embeddings, embeddings_list)
 
