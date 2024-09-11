@@ -2,7 +2,16 @@ import pytest
 from typing import cast
 import numpy as np
 import chromadb.errors as errors
-from chromadb.api.types import (RecordSet, does_record_set_contain_data, validate_embeddings, Embeddings, IDs, validate_ids, validate_record_set_consistency, maybe_cast_one_to_many_embedding)
+from chromadb.api.types import (
+    RecordSet,
+    does_record_set_contain_data,
+    validate_embeddings,
+    Embeddings,
+    IDs,
+    validate_ids,
+    validate_record_set_consistency,
+    maybe_cast_one_to_many_embedding,
+)
 
 def test_does_record_set_contain_data() -> None:
     valid_record_set: RecordSet = {
