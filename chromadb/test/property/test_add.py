@@ -107,7 +107,7 @@ def _test_add(
 
     # TODO: The type of add() is incorrect as it does not allow for metadatas
     # like [{"a": 1}, None, {"a": 3}]
-    result = coll.add(**record_set)  # type: ignore
+    result = coll.add(**record_set)  # type: ignore[arg-type]
     if normalized_record_set["ids"] is None:
         normalized_record_set["ids"] = result["ids"]
 
