@@ -1,5 +1,10 @@
 import pytest
-from chromadb.api.types import RecordSet, does_record_set_contain_data, validate_embeddings, Embeddings
+from chromadb.api.types import (
+    RecordSet,
+    does_record_set_contain_data,
+    validate_embeddings,
+    Embeddings,
+)
 
 
 def test_does_record_set_contain_data() -> None:
@@ -41,6 +46,7 @@ def test_does_record_set_contain_data() -> None:
         "Expected include key to be a a known field of RecordSet, got non_existent_field"
         in str(e)
     )
+
 
 def test_embeddings_validation() -> None:
     invalid_embeddings = [[0, 0, True], [1.2, 2.24, 3.2]]
