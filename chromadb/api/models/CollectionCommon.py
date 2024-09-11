@@ -183,10 +183,8 @@ class CollectionCommon(Generic[ClientT]):
         if record_set["documents"] is not None and record_set["images"] is not None:
             raise ValueError("You can only provide documents or images, not both.")
 
-        if (
-            require_data
-            and does_record_set_contain_data(record_set, ignore=["ids", "metadatas"])
-            is False
+        if require_data and not does_record_set_contain_data(
+            record_set, include=["embeddings", "documents", "images", "uris"]
         ):
             raise ValueError("You must provide embeddings, documents, images, or URIs.")
 
