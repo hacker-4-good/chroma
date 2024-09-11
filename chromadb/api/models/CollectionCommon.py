@@ -391,7 +391,7 @@ class CollectionCommon(Generic[ClientT]):
             require_data=True,
         )
 
-        prepared_embeddings = (
+        unpacked_record_set["embeddings"] = (
             self._compute_embeddings(
                 documents=unpacked_record_set["documents"],
                 images=unpacked_record_set["images"],
@@ -400,8 +400,6 @@ class CollectionCommon(Generic[ClientT]):
             if unpacked_record_set["embeddings"] is None
             else unpacked_record_set["embeddings"]
         )
-
-        unpacked_record_set["embeddings"] = prepared_embeddings
 
         return unpacked_record_set
 
@@ -473,8 +471,7 @@ class CollectionCommon(Generic[ClientT]):
             require_data=False,
         )
 
-        prepared_embeddings = unpacked_record_set["embeddings"]
-        if prepared_embeddings is None and does_record_set_contain_data(
+        if unpacked_record_set["embeddings"] is None and does_record_set_contain_data(
             unpacked_record_set, include=["documents", "images"]
         ):
             unpacked_record_set["embeddings"] = self._compute_embeddings(
