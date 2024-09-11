@@ -13,6 +13,7 @@ from chromadb.api.types import (
     maybe_cast_one_to_many_embedding,
 )
 
+
 def test_does_record_set_contain_data() -> None:
     valid_record_set: RecordSet = {
         "ids": ["1", "2", "3"],
